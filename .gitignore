@@ -1,0 +1,15 @@
+**/node_modules/
+**/dist/
+**/*.tsbuildinfo
+source/vite.config.js
+source/vite.config.d.ts
+Cert-oki-one-click/app/
+output/
+outputs/
+.playwright-cli/
+.env
+.env.*
+*.log
+*.zip
+.DS_Store
+Thumbs.db
