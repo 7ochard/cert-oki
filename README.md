@@ -4,6 +4,10 @@
 
 用于编辑、批量生成服装合格证与条码的本地网页工具，基于 React、TypeScript 和 Vite。
 
+左侧填写公共信息，右侧预览整批合格证；每张可分别修改尺码、颜色和 EAN，选择范围后导出。
+
+![Cert-oki 合格证编辑与批量预览](docs/screenshots/certificate-editor.png)
+
 ## 下载使用
 
 在 [GitHub Releases](https://github.com/7ochard/cert-oki/releases/tag/v0.1.0-alpha.1) 下载 `Cert-oki-v0.1.0-alpha.1.zip`，完整解压后运行：
@@ -20,6 +24,18 @@
 - 条码与二维码生成、整批或单张输出范围。
 - 合格证 SVG、JPG、PDF 导出；整批 JPG 为 ZIP。
 - 条码 SVG 导出、SVG 与 Illustrator 复制入口。
+
+## 界面预览
+
+以下截图来自 `0.1.0-alpha.1` 实际启动包，使用应用自带示例数据。
+
+**逐张明细：** 在表格中分别编辑尺码、号型、颜色和 EAN，也可统一覆盖指定字段。
+
+![逐张明细与批量编辑](docs/screenshots/batch-details.png)
+
+**条码生成：** 选择码制、设置起始数据，预览后导出 SVG。
+
+![EAN-13 条码生成与导出](docs/screenshots/barcode-generator.png)
 
 ## 开发
 
