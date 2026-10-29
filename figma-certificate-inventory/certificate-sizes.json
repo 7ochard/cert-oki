@@ -1,0 +1,438 @@
+{
+  "schemaVersion": "1.0.0",
+  "snapshotDate": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "source": {
+    "fileKey": "JxmqUNYk2Gx5UZugvM5oV8",
+    "fileName": "包装 - 合格证 - 水洗唛",
+    "fileUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8",
+    "pagesScanned": 17
+  },
+  "unit": "px",
+  "measurement": {
+    "fields": [
+      "width",
+      "height"
+    ],
+    "precisionDecimals": 2,
+    "orientation": "width_x_height",
+    "countingUnit": "一个完整合格证的独立画板外框",
+    "includesDuplicateAndReprintFrames": true,
+    "includesPrintQuantitiesInNames": false
+  },
+  "summary": {
+    "sizeVariantCount": 8,
+    "standaloneFrameCount": 127,
+    "pageBreakdownCount": 16,
+    "montageImageCount": 5
+  },
+  "sizes": [
+    {
+      "width": 80,
+      "height": 120,
+      "count": 27,
+      "occurrences": [
+        {
+          "pageId": "46:2",
+          "pageName": "26AW合格证",
+          "count": 17,
+          "sampleNodeId": "46:9",
+          "sampleNodeName": "羽绒内胆",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=46-9",
+          "nodeIds": [
+            "46:9",
+            "46:77",
+            "46:254",
+            "46:431",
+            "46:136",
+            "46:313",
+            "46:490",
+            "46:195",
+            "46:967",
+            "52:64",
+            "46:372",
+            "46:549",
+            "47:541",
+            "47:785",
+            "47:602",
+            "47:663",
+            "47:724"
+          ]
+        },
+        {
+          "pageId": "114:2184",
+          "pageName": "羽绒内胆合格证",
+          "count": 10,
+          "sampleNodeId": "114:3779",
+          "sampleNodeName": "男款黑色针织拼接羽绒夹克20张-40x60mm-01",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=114-3779",
+          "nodeIds": [
+            "114:3779",
+            "114:3840",
+            "114:3901",
+            "114:3960",
+            "114:4021",
+            "114:4082",
+            "114:4141",
+            "114:4202",
+            "114:4263",
+            "114:4322"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 400,
+      "height": 600,
+      "count": 17,
+      "occurrences": [
+        {
+          "pageId": "270:293",
+          "pageName": "NEON手套合格证",
+          "count": 1,
+          "sampleNodeId": "270:297",
+          "sampleNodeName": "黑色羽绒手套合格证120张-40x60mm-01",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=270-297",
+          "nodeIds": [
+            "270:297"
+          ]
+        },
+        {
+          "pageId": "270:231",
+          "pageName": "羽绒手套合格证 [补打]",
+          "count": 1,
+          "sampleNodeId": "270:232",
+          "sampleNodeName": "黑色羽绒手套合格证120张-40x60mm-01",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=270-232",
+          "nodeIds": [
+            "270:232"
+          ]
+        },
+        {
+          "pageId": "270:355",
+          "pageName": "儿童手套合格证",
+          "count": 1,
+          "sampleNodeId": "270:356",
+          "sampleNodeName": "黑色羽绒手套合格证120张-40x60mm-01",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=270-356",
+          "nodeIds": [
+            "270:356"
+          ]
+        },
+        {
+          "pageId": "89:115",
+          "pageName": "仿狐狸毛针织帽合格证&洗水唛",
+          "count": 5,
+          "sampleNodeId": "88:340",
+          "sampleNodeName": "针织帽合格证120张-01-40x60mm",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=88-340",
+          "nodeIds": [
+            "88:340",
+            "88:416",
+            "88:492",
+            "88:568",
+            "88:644"
+          ]
+        },
+        {
+          "pageId": "113:728",
+          "pageName": "羽绒服合格证&洗水唛",
+          "count": 9,
+          "sampleNodeId": "113:1262",
+          "sampleNodeName": "灰色羽绒服合格证120张-40x60mm-01",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=113-1262",
+          "nodeIds": [
+            "113:1262",
+            "113:1263",
+            "113:1264",
+            "113:1265",
+            "113:1494",
+            "113:1495",
+            "113:1496",
+            "113:1497",
+            "157:224"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 500,
+      "height": 550,
+      "count": 13,
+      "occurrences": [
+        {
+          "pageId": "270:355",
+          "pageName": "儿童手套合格证",
+          "count": 3,
+          "sampleNodeId": "304:13211",
+          "sampleNodeName": "半包护脸-黑-F-600个",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-13211",
+          "nodeIds": [
+            "304:13211",
+            "304:13246",
+            "304:13278"
+          ]
+        },
+        {
+          "pageId": "304:22934",
+          "pageName": "护具",
+          "count": 10,
+          "sampleNodeId": "323:1592",
+          "sampleNodeName": "护臀-XS",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=323-1592",
+          "nodeIds": [
+            "323:1592",
+            "321:702",
+            "321:554",
+            "321:734",
+            "321:591",
+            "321:766",
+            "321:628",
+            "321:798",
+            "321:665",
+            "321:830"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 500,
+      "height": 800,
+      "count": 18,
+      "occurrences": [
+        {
+          "pageId": "141:40",
+          "pageName": "速干衣可撕水洗标",
+          "count": 18,
+          "sampleNodeId": "304:18365",
+          "sampleNodeName": "女白衣S",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-18365",
+          "nodeIds": [
+            "304:18365",
+            "304:18433",
+            "304:18501",
+            "304:18569",
+            "304:18637",
+            "304:18705",
+            "304:18773",
+            "304:18841",
+            "304:18909",
+            "304:18977",
+            "304:19045",
+            "304:19113",
+            "304:19181",
+            "304:19249",
+            "304:19317",
+            "304:19385",
+            "304:19453",
+            "304:19521"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 700,
+      "height": 250,
+      "count": 23,
+      "occurrences": [
+        {
+          "pageId": "270:293",
+          "pageName": "NEON手套合格证",
+          "count": 10,
+          "sampleNodeId": "326:1732",
+          "sampleNodeName": "儿童手套-鹅黄- XXS-70个",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=326-1732",
+          "nodeIds": [
+            "326:1732",
+            "326:1763",
+            "326:1795",
+            "326:1827",
+            "326:1859",
+            "326:1891",
+            "326:1923",
+            "326:1955",
+            "326:1987",
+            "326:2019"
+          ]
+        },
+        {
+          "pageId": "270:355",
+          "pageName": "儿童手套合格证",
+          "count": 13,
+          "sampleNodeId": "304:13091",
+          "sampleNodeName": "手套内胆-黑-S",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-13091",
+          "nodeIds": [
+            "304:13091",
+            "304:13121",
+            "304:13154",
+            "304:13337",
+            "304:13368",
+            "304:13400",
+            "304:13432",
+            "304:13464",
+            "304:13496",
+            "304:13528",
+            "304:13560",
+            "304:13592",
+            "304:13624"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 750,
+      "height": 250,
+      "count": 1,
+      "occurrences": [
+        {
+          "pageId": "270:293",
+          "pageName": "NEON手套合格证",
+          "count": 1,
+          "sampleNodeId": "270:417",
+          "sampleNodeName": "黑色羽绒手套合格证120张-40x60mm-01",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=270-417",
+          "nodeIds": [
+            "270:417"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 900,
+      "height": 300,
+      "count": 6,
+      "occurrences": [
+        {
+          "pageId": "91:1646",
+          "pageName": "袜子合格证",
+          "count": 6,
+          "sampleNodeId": "91:1929",
+          "sampleNodeName": "灰蓝M-90x30mm-550张",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=91-1929",
+          "nodeIds": [
+            "91:1929",
+            "99:156",
+            "99:239",
+            "91:2027",
+            "99:192",
+            "99:275"
+          ]
+        }
+      ]
+    },
+    {
+      "width": 1050,
+      "height": 250,
+      "count": 22,
+      "occurrences": [
+        {
+          "pageId": "270:293",
+          "pageName": "NEON手套合格证",
+          "count": 9,
+          "sampleNodeId": "304:11316",
+          "sampleNodeName": "滑雪手套-黑-S-250个",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-11316",
+          "nodeIds": [
+            "304:11316",
+            "304:11344",
+            "304:11376",
+            "304:11408",
+            "304:11440",
+            "304:11472",
+            "304:11504",
+            "304:11536",
+            "304:11568"
+          ]
+        },
+        {
+          "pageId": "270:231",
+          "pageName": "羽绒手套合格证 [补打]",
+          "count": 13,
+          "sampleNodeId": "519:524",
+          "sampleNodeName": "羽绒滑雪手套-黑-S-150个",
+          "sampleUrl": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=519-524",
+          "nodeIds": [
+            "519:524",
+            "519:556",
+            "519:588",
+            "519:620",
+            "519:652",
+            "519:684",
+            "519:716",
+            "519:748",
+            "519:780",
+            "519:892",
+            "519:924",
+            "519:968",
+            "519:996"
+          ]
+        }
+      ]
+    }
+  ],
+  "montageImages": [
+    {
+      "pageId": "304:125",
+      "pageName": "雪服贴标",
+      "nodeId": "304:1625",
+      "nodeName": "26AW滑雪服合格证 - 转曲 1",
+      "width": 8492.17,
+      "height": 5403.91,
+      "count": 1,
+      "url": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-1625",
+      "singleCertificateSize": null
+    },
+    {
+      "pageId": "304:125",
+      "pageName": "雪服贴标",
+      "nodeId": "304:1626",
+      "nodeName": "26AW滑雪服合格证 - 转曲 2",
+      "width": 8492.17,
+      "height": 3429.85,
+      "count": 1,
+      "url": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-1626",
+      "singleCertificateSize": null
+    },
+    {
+      "pageId": "304:125",
+      "pageName": "雪服贴标",
+      "nodeId": "304:1627",
+      "nodeName": "26AW滑雪服合格证 - 转曲 3",
+      "width": 8492.17,
+      "height": 1813.9,
+      "count": 1,
+      "url": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-1627",
+      "singleCertificateSize": null
+    },
+    {
+      "pageId": "304:125",
+      "pageName": "雪服贴标",
+      "nodeId": "304:1628",
+      "nodeName": "26AW滑雪服合格证 - 转曲 4",
+      "width": 8492.17,
+      "height": 2939.67,
+      "count": 1,
+      "url": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-1628",
+      "singleCertificateSize": null
+    },
+    {
+      "pageId": "304:125",
+      "pageName": "雪服贴标",
+      "nodeId": "304:1629",
+      "nodeName": "26AW滑雪服合格证 - 转曲 5",
+      "width": 8492.17,
+      "height": 2607.11,
+      "count": 1,
+      "url": "https://www.figma.com/design/JxmqUNYk2Gx5UZugvM5oV8?node-id=304-1629",
+      "singleCertificateSize": null
+    }
+  ],
+  "excludedCategories": [
+    "水洗唛、包装展开图、物流标签及其他非合格证对象",
+    "合格证内部文字、背景、装饰、标题和内容组件",
+    "拼版容器外框；其中有独立画板的单张合格证分别计数",
+    "只有部分合格证内容的残留组件",
+    "EAN条码校对标签"
+  ]
+}
