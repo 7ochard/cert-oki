@@ -32,7 +32,7 @@ import type {
 import "./styles.css";
 import "./workflow.css";
 import { CountInput, DetailEditor, useModalFocus } from "./DetailEditor";
-import { AccountDock } from "../../../src/components/account-dock";
+import { AccountDock } from "./account/account-dock";
 import { Popover, SelectField as DropdownSelect } from "./ui/overlay";
 import { createWorkspace, DETAIL_FIELDS, resizeBarcodes, resizeCertificates, resequenceBarcodes, selectOutput, switchMode, updateDefaults, type BarcodeDraft, type Workspace } from "./core/workspace";
 import { previewInput, usePreview, type PreviewItem } from "./usePreview";
