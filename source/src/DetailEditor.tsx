@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
+import { SelectField } from "./ui/overlay";
 import { DEFAULT_CERTIFICATE_FIELD_LABELS } from "./core";
 import { DETAIL_FIELDS, editCertificateRow, normalizeCount, resequenceBarcodes, resequenceCertificateEans,
   resetRowField, resizeBarcodes, resizeCertificates, resolveCertificate, SIZE_SPECS, syncSizeSpec, type Workspace } from "./core/workspace";
@@ -60,8 +61,10 @@ export function DetailEditor({ initial, selectedId, initialField, onApply, onClo
   const fields = more ? [...DETAIL_FIELDS, ...allFields.filter((key) => !DETAIL_FIELDS.includes(key))] : DETAIL_FIELDS;
   const label = (key: string) => doc.defaults.fieldLabels[key] ?? DEFAULT_CERTIFICATE_FIELD_LABELS[key] ?? key;
   const [seed, setSeed] = useState(certificate ? resolveCertificate(doc, doc.rows[0]).fields.ean : barcode!.seed);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
-  const close = () => { if (!dirty || window.confirm("放弃本次尚未应用的明细修改？")) onClose(); };
+  const [discarding, setDiscarding] = useState(false);
+  const baseline = useRef(initial);
+  const dirty = JSON.stringify(draft) !== JSON.stringify(baseline.current);
+  const close = () => { if (!dirty) onClose(); else setDiscarding(true); };
   const modalRef = useModalFocus(close);
 
   function run(updater: (workspace: Workspace) => Workspace) {
@@ -80,7 +83,6 @@ export function DetailEditor({ initial, selectedId, initialField, onApply, onClo
     });
   }
   function resize(count: number) {
-    if (count < rows.length && !window.confirm(`将删除末尾 ${rows.length - count} 张记录，是否继续？`)) return;
     run((state) => certificate ? { ...state, certificate: resizeCertificates(state.certificate, count) }
       : { ...state, barcodes: { ...state.barcodes, [state.mode]: resizeBarcodes(barcode!, count) } });
   }
@@ -101,8 +103,10 @@ export function DetailEditor({ initial, selectedId, initialField, onApply, onClo
 
   return <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="逐张明细">
     <section className="batch-editor" ref={modalRef}>
-      <header><div><p className="eyebrow">编辑 → 应用 → 自动预览</p><h3>逐张明细 · {rows.length} 张</h3></div>
-        <button type="button" className="icon-button" onClick={close} aria-label="关闭明细"><X size={18} /></button></header>
+      <header><div><p className="eyebrow">编辑 → 应用 → 自动预览</p><h3>逐张明细 {rows.length} 张</h3></div>
+        {discarding ? <div className="discard-confirm" role="group" aria-label="放弃修改"><span>放弃尚未应用的修改？</span><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => setDiscarding(false)}>继续编辑</button><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={onClose}>放弃修改</button></div>
+          : <button type="button" className="icon-button" onMouseDown={(event) => event.preventDefault()} onClick={close} aria-label="关闭明细"><X size={18} /></button>}
+      </header>
       <div className="detail-tools">
         <CountInput count={rows.length} onCommit={resize} />
         {certificate && <button type="button" aria-pressed={more} onClick={() => setMore(!more)}>{more ? "收起更多字段" : "更多字段"}</button>}
@@ -123,21 +127,21 @@ export function DetailEditor({ initial, selectedId, initialField, onApply, onClo
               value={key === "title" ? item.title : item.fields[key] ?? ""}
               onChange={(event) => editCell(row.id, key, event.target.value)} />
               {override && <button type="button" className="override-badge" title="恢复继承公共信息" onClick={() => setDraft((state) => ({ ...state, certificate: { ...state.certificate,
-                rows: state.certificate.rows.map((candidate) => candidate.id === row.id ? resetRowField(candidate, key) : candidate) } }))}>单张例外 · 恢复继承</button>}
+                rows: state.certificate.rows.map((candidate) => candidate.id === row.id ? resetRowField(candidate, key) : candidate) } }))}>单张例外 恢复继承</button>}
               {key === "sizeSpec" && row.manualSizeSpec && <button type="button" className="override-badge" disabled={!SIZE_SPECS[item.fields.sizeCode]} onClick={() => {
                 if (window.confirm("用当前尺码的默认号型覆盖手动号型？")) setDraft((state) => ({ ...state, certificate: { ...state.certificate,
                   rows: state.certificate.rows.map((candidate) => candidate.id === row.id ? syncSizeSpec(state.certificate, candidate) : candidate) } }));
-              }}>手动号型 · 恢复联动</button>}
+              }}>手动号型 恢复联动</button>}
             </td>;
           }) : <td><input aria-label={`第 ${index + 1} 张数据`} data-initial-focus={record.id === selectedId ? true : undefined} value={barcode!.rows[index].data}
             onChange={(event) => editBarcode(record.id, event.target.value)} /></td>}
           <td><button type="button" className="icon-button" aria-label={`删除第 ${index + 1} 张`} disabled={rows.length === 1} onClick={() => remove(record.id, index)}><Trash2 size={15} /></button></td>
         </tr>)}</tbody></table></div>
-      {certificate && <div className="detail-tools bulk-tools"><label>覆盖字段<select aria-label="覆盖字段" value={bulkKey} onChange={(event) => setBulkKey(event.target.value)}>{allFields.map((key) => <option value={key} key={key}>{label(key)}</option>)}</select></label>
+      {certificate && <div className="detail-tools bulk-tools"><label>覆盖字段<SelectField ariaLabel="覆盖字段" value={bulkKey} options={allFields.map((key) => ({ label: label(key), value: key }))} onChange={setBulkKey} /></label>
         <label>统一值<input aria-label="统一值" value={bulkValue} onChange={(event) => setBulkValue(event.target.value)} /></label>
         <button type="button" onClick={bulk}>覆盖全部 {rows.length} 张…</button></div>}
       <footer><button type="button" disabled={rows.length >= 500} onClick={() => resize(rows.length + 1)}><Plus size={17} />增加一行</button>
-        <button type="button" onClick={close}>取消</button><button type="button" className="primary-button" onClick={() => onApply(draft)}>应用明细</button></footer>
+        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={close}>取消</button><button type="button" className="primary-button" onClick={() => onApply(draft)}>应用明细</button></footer>
     </section>
   </div>;
 }

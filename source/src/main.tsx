@@ -1,8 +1,6 @@
-import React, { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Check,
-  ChevronDown,
   Copy,
   Download,
   Eye,
@@ -34,6 +32,8 @@ import type {
 import "./styles.css";
 import "./workflow.css";
 import { CountInput, DetailEditor, useModalFocus } from "./DetailEditor";
+import { AccountDock } from "../../../src/components/account-dock";
+import { Popover, SelectField as DropdownSelect } from "./ui/overlay";
 import { createWorkspace, DETAIL_FIELDS, resizeBarcodes, resizeCertificates, resequenceBarcodes, selectOutput, switchMode, updateDefaults, type BarcodeDraft, type Workspace } from "./core/workspace";
 import { previewInput, usePreview, type PreviewItem } from "./usePreview";
 import { prepareSvgForClipboard } from "./core/svg";
@@ -118,20 +118,13 @@ const COLOR_PALETTE = [
   ["#777777", "#666666", "#555555", "#444444", "#333333", "#222222", "#111111", "#000000"]
 ];
 
-interface DropdownOption<T extends string> {
-  label: string;
-  value: T;
-  description?: string;
-  extra?: string;
-  disabled?: boolean;
-}
-
 export function App() {
   const [workspace, setWorkspace] = useState<Workspace>(createWorkspace);
   const [name, setName] = useState("合格证 1");
   const [scope, setScope] = useState<"all" | "current">("all");
   const [selectedId, setSelectedId] = useState("");
   const [format, setFormat] = useState<CertificateExportOptions["format"]>("svg");
+  const [copyAs, setCopyAs] = useState<"svg" | "illustrator">("svg");
   const [editor, setEditor] = useState<{ workspace: Workspace; id: string; field?: string } | null>(null);
   const [viewer, setViewer] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
@@ -164,6 +157,13 @@ export function App() {
   function updateCertificateTitle(title: string) {
     updateCertificate((item) => ({ ...item, title }));
   }
+  function applyCms(entry: { title: string; body: string }) {
+    setName(entry.title);
+    if (!isCertificate) return;
+    updateCertificateTitle(entry.title);
+    updateCertificateField("standard", entry.body);
+    showToast("已写入合格证标题和执行标准");
+  }
   function updateBarcode(updater: (draft: BarcodeDraft) => BarcodeDraft) {
     setWorkspace((state) => state.mode === "certificate" ? state : {
       ...state, barcodes: { ...state.barcodes, [state.mode]: updater(state.barcodes[state.mode]!) }
@@ -183,7 +183,6 @@ export function App() {
     setSelectedId(id); setEditor({ workspace, id, field });
   }
   function resize(count: number) {
-    if (count < rows.length && !window.confirm("将删除末尾 " + (rows.length - count) + " 张记录，是否继续？")) return;
     try {
       if (isCertificate) setWorkspace({ ...workspace, certificate: resizeCertificates(doc, count) });
       else updateBarcode(() => resizeBarcodes(barcode!, count));
@@ -332,11 +331,10 @@ export function App() {
 
   return <div className="page-shell"><main className="app-shell">
     <aside className="control-rail" aria-label="参数">
+      <div className="control-rail-scroll">
       <section className="control-section two-up">
         <label>项目名称<input aria-label="项目名称" value={name} onChange={(event) => setName(event.target.value)} /></label>
-        <label>功能<select aria-label="功能" value={isCertificate ? "certificate" : "barcode"} onChange={(event) => chooseMode(event.target.value === "certificate" ? "certificate" : lastBarcodeMode.current)}>
-          <option value="certificate">合格证</option><option value="barcode">条码 / 二维码</option>
-        </select></label>
+        <label>功能<DropdownSelect ariaLabel="功能" value={isCertificate ? "certificate" : "barcode"} options={[{ label: "合格证", value: "certificate" }, { label: "条码 / 二维码", value: "barcode" }]} onChange={(value) => chooseMode(value === "certificate" ? "certificate" : lastBarcodeMode.current)} /></label>
       </section>
       {isCertificate ? <>
         <div className="section-heading"><h2>公共信息</h2><p>作为整批默认值，保留明细中的单张例外。</p></div>
@@ -348,7 +346,7 @@ export function App() {
               : <input aria-label={"公共" + getCertificateFieldLabel(doc.defaults, key)} value={doc.defaults.fields[key]} onChange={(event) => updateCertificateField(key, event.target.value)} />}
           </label>)}
         </section>
-        <details className="layout-settings"><summary>版式设置 <span>字体 · 尺寸 · 显隐 · 排序</span></summary>
+        <details className="layout-settings"><summary>版式设置 <span>字体 尺寸 显隐 排序</span></summary>
           <p className="workflow-hint">版式设置作用于整批；内容请在公共信息或逐张明细中编辑。</p>
           <CertificateControls certificate={doc.defaults} customFieldKeys={customFieldKeys} fontOptions={FONT_OPTIONS}
             toggleFieldVisibility={toggleCertificateField}
@@ -364,7 +362,7 @@ export function App() {
             {barcode!.seed !== barcode!.appliedSeed && <button type="button" onClick={() => updateBarcode((draft) => ({ ...draft, seed: draft.appliedSeed }))}>撤销起始数据修改</button>}
           </div>
         </section>
-        <details className="layout-settings"><summary>版式设置 <span>高度 · 缩放 · 文字</span></summary>
+        <details className="layout-settings"><summary>版式设置 <span>高度 缩放 文字</span></summary>
           <section className="control-section two-up">
             <label>高度 mm<input aria-label="条码高度" type="number" min="5" max="120" step="0.1" value={barcode!.options.heightMm} onChange={(event) => setBarcodeOption("heightMm", Number(event.target.value))} /></label>
             <label>缩放<input aria-label="条码缩放" type="number" min="1" max="5" value={barcode!.options.scale} onChange={(event) => setBarcodeOption("scale", Number(event.target.value))} /></label>
@@ -373,33 +371,41 @@ export function App() {
           </section>
         </details>
       </>}
+      </div>
+      <AccountDock onApply={applyCms} />
     </aside>
     <section className="workspace" aria-label="预览和输出">
       <div className="workspace-toolbar workflow-toolbar">
-        <div className="button-row"><CountInput count={rows.length} onCommit={resize} label={isCertificate ? "合格证数量" : "条码数量"} />
+        <div className="button-row toolbar-primary"><CountInput count={rows.length} onCommit={resize} label={isCertificate ? "合格证数量" : "条码数量"} />
           <button type="button" onClick={() => openBatchEditor()}><Table2 size={16} />逐张明细</button>
         </div>
-        <div className="button-row">
-          <label className="scope-control">输出范围<select aria-label="输出范围" value={scope} onChange={(event) => setScope(event.target.value as "all" | "current")}>
-            <option value="all">全部 {rows.length} 张</option><option value="current">当前第 {rows.findIndex((row) => row.id === currentId) + 1} 张</option>
-          </select></label>
-          <button type="button" disabled={!ready} onClick={() => copy("illustrator")}><Copy size={16} />复制到 Illustrator</button>
-          <button type="button" disabled={!ready} onClick={() => copy("svg")}><Copy size={16} />复制为 SVG</button>
-          {isCertificate && <label className="format-control"><span className="sr-only">下载格式</span><select aria-label="下载格式" value={format} onChange={(event) => setFormat(event.target.value as typeof format)}>
-            {EXPORT_FORMAT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </select></label>}
-          <button type="button" disabled={!ready} onClick={download}><Download size={16} />{exporting ? "下载准备中" : "下载 " + (isCertificate ? format === "jpg" && chosen.length > 1 ? "JPG ZIP" : format.toUpperCase() : "SVG")}</button>
+        <div className="button-row toolbar-output">
+          <label className="scope-control">输出范围<DropdownSelect ariaLabel="输出范围" value={scope} options={[{ label: "全部 " + rows.length + " 张", value: "all" }, { label: "当前第 " + (rows.findIndex((row) => row.id === currentId) + 1) + " 张", value: "current" }]} onChange={setScope} /></label>
+          <div className="split-control">
+            <button type="button" className="split-action" aria-label="复制为" disabled={!ready} onClick={() => copy(copyAs)}><Copy size={16} /></button>
+            <span className="split-divider" aria-hidden="true" />
+            <DropdownSelect ariaLabel="复制格式" disabled={!ready} value={copyAs} options={[{ label: "SVG", value: "svg" }, { label: "Illustrator", value: "illustrator" }]} onChange={setCopyAs} />
+          </div>
+          <div className="split-control">
+            <button type="button" className="split-action" aria-label={exporting ? "下载准备中" : "下载"} disabled={!ready} onClick={download}><Download size={16} /></button>
+            {isCertificate && <span className="split-divider" aria-hidden="true" />}
+            {isCertificate && <DropdownSelect ariaLabel="下载格式" disabled={!ready} value={format} options={EXPORT_FORMAT_OPTIONS} onChange={setFormat} />}
+          </div>
         </div>
       </div>
-      <div className="workflow-status" role="status">{preview.busy ? "正在更新预览…" : preview.error ? "预览未更新，输出已暂停" : rows.length + " 张已更新 · " + (scope === "all" ? "输出整批" : "仅输出当前张")}
+      <div className="workflow-status" role="status">{preview.busy ? "正在更新预览…" : preview.error ? "预览未更新，输出已暂停" : rows.length + " 张已更新 " + (scope === "all" ? "输出整批" : "仅输出当前张")}
         {preview.error && <button type="button" onClick={() => setRetry((value) => value + 1)}><RefreshCcw size={14} />重试</button>}
       </div>
       {(preview.error || actionError) && <div className="error-panel" role="alert">{actionError || preview.error}</div>}
       <div className={"result-grid " + (isCertificate ? "is-certificate" : "is-barcode") + (!preview.ready ? " is-stale" : "")} aria-busy={preview.busy}>
         {preview.items.filter((item) => rows.some((row) => row.id === item.id)).map((item, index) => <article className={"result-card" + (item.id === currentId ? " is-selected" : "")} key={item.id}>
-          <div className="result-card-head"><button type="button" aria-pressed={item.id === currentId} onClick={() => setSelectedId(item.id)}>第 {index + 1} 张{item.id === currentId ? " · 当前" : ""}</button>
-            <button type="button" onClick={() => openBatchEditor(undefined, item.id)}>编辑此张</button>
-            <button type="button" aria-label={"放大第 " + (index + 1) + " 张"} onClick={() => setViewer(item.id)}><Eye size={15} /></button></div>
+          <div className="result-card-head">
+            <button type="button" aria-pressed={item.id === currentId} onClick={() => setSelectedId(item.id)}>第 {index + 1} 张{item.id === currentId ? " 当前" : ""}</button>
+            <div className="result-card-actions">
+              <button type="button" onClick={() => openBatchEditor(undefined, item.id)}>编辑此张</button>
+              <button type="button" className="icon-button" aria-label={"放大第 " + (index + 1) + " 张"} onClick={() => setViewer(item.id)}><Eye size={16} /></button>
+            </div>
+          </div>
           <button type="button" className="result-preview" aria-label={"选择第 " + (index + 1) + " 张"} onClick={(event) => {
             setSelectedId(item.id);
             const field = getPreviewFieldKey(event.target);
@@ -433,160 +439,6 @@ function ResultViewer({ items, id, onChange, onClose }: { items: PreviewItem[]; 
   </section></div>;
 }
 
-function DropdownSelect<T extends string>({
-  ariaLabel,
-  disabled = false,
-  onChange,
-  onDoubleClick,
-  options,
-  value
-}: {
-  ariaLabel: string;
-  disabled?: boolean;
-  onChange: (value: T) => void;
-  onDoubleClick?: () => void;
-  options: ReadonlyArray<DropdownOption<T>>;
-  value: T;
-}) {
-  const [open, setOpen] = useState(false);
-  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const dropdownId = useId();
-  const selected = options.find((option) => option.value === value) ?? { label: value, value };
-
-  useLayoutEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function updateMenuPosition() {
-      const trigger = triggerRef.current;
-      if (!trigger) {
-        return;
-      }
-      const rect = trigger.getBoundingClientRect();
-      const viewportGap = 12;
-      const availableBelow = window.innerHeight - rect.bottom - viewportGap;
-      const availableAbove = rect.top - viewportGap;
-      const placeAbove = availableBelow < 220 && availableAbove > availableBelow;
-      const maxHeight = Math.min(320, Math.max(160, placeAbove ? availableAbove : availableBelow));
-      setMenuStyle({
-        left: Math.max(viewportGap, Math.min(rect.left, window.innerWidth - rect.width - viewportGap)),
-        top: placeAbove ? Math.max(viewportGap, rect.top - maxHeight - 8) : rect.bottom + 8,
-        minWidth: rect.width,
-        maxHeight
-      });
-    }
-
-    updateMenuPosition();
-    window.addEventListener("resize", updateMenuPosition);
-    window.addEventListener("scroll", updateMenuPosition, true);
-    return () => {
-      window.removeEventListener("resize", updateMenuPosition);
-      window.removeEventListener("scroll", updateMenuPosition, true);
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function handlePointerDown(event: MouseEvent | TouchEvent) {
-      const target = event.target as Node;
-      if (triggerRef.current?.contains(target) || menuRef.current?.contains(target)) {
-        return;
-      }
-      setOpen(false);
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    }
-
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("touchstart", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open]);
-
-  function handleSelect(option: DropdownOption<T>) {
-    if (option.disabled) {
-      return;
-    }
-    onChange(option.value);
-    setOpen(false);
-    triggerRef.current?.focus();
-  }
-
-  return (
-    <div className="dropdown-field">
-      <button
-        ref={triggerRef}
-        className={open ? "dropdown-trigger is-open" : "dropdown-trigger"}
-        type="button"
-        role="combobox"
-        aria-controls={dropdownId}
-        aria-expanded={open}
-        aria-haspopup="listbox"
-        aria-label={ariaLabel}
-        disabled={disabled}
-        onClick={() => setOpen((current) => !current)}
-        onDoubleClick={onDoubleClick}
-      >
-        <span className="dropdown-trigger-content">
-          <span className="dropdown-value">{selected?.label ?? "-"}</span>
-          {selected?.extra ? <span className="dropdown-extra">{selected.extra}</span> : null}
-        </span>
-        <ChevronDown className="dropdown-chevron" size={17} />
-      </button>
-
-      {open
-        ? createPortal(
-          <div
-            ref={menuRef}
-            className="dropdown-menu"
-            id={dropdownId}
-            role="listbox"
-            style={menuStyle}
-          >
-            {options.map((option) => {
-              const selectedOption = option.value === value;
-              return (
-                <button
-                  className={selectedOption ? "dropdown-option is-selected" : "dropdown-option"}
-                  key={option.value}
-                  type="button"
-                  role="option"
-                  aria-selected={selectedOption}
-                  disabled={option.disabled}
-                  onClick={() => handleSelect(option)}
-                >
-                  <span className="dropdown-option-main">
-                    <span>{option.label}</span>
-                    {option.description ? <small>{option.description}</small> : null}
-                  </span>
-                  {option.extra ? <span className="dropdown-extra">{option.extra}</span> : null}
-                  {selectedOption ? <Check size={15} /> : null}
-                </button>
-              );
-            })}
-          </div>,
-          document.body
-        )
-        : null}
-    </div>
-  );
-}
-
 function ColorPickerControl({
   ariaLabel,
   onChange,
@@ -599,78 +451,12 @@ function ColorPickerControl({
   const safeValue = toNearestGrayHex(normalizeHexColor(value) ?? "#ffffff");
   const [open, setOpen] = useState(false);
   const [hexDraft, setHexDraft] = useState(safeValue.toUpperCase());
-  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const panelId = useId();
   const cmyk = hexToCmyk(safeValue);
 
   useEffect(() => {
     setHexDraft(safeValue.toUpperCase());
   }, [safeValue]);
-
-  useLayoutEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function updatePanelPosition() {
-      const trigger = triggerRef.current;
-      if (!trigger) {
-        return;
-      }
-      const rect = trigger.getBoundingClientRect();
-      const viewportGap = 12;
-      const panelWidth = 280;
-      const panelHeight = 330;
-      const availableBelow = window.innerHeight - rect.bottom - viewportGap;
-      const availableAbove = rect.top - viewportGap;
-      const placeAbove = availableBelow < panelHeight && availableAbove > availableBelow;
-      setPanelStyle({
-        left: Math.max(viewportGap, Math.min(rect.left, window.innerWidth - panelWidth - viewportGap)),
-        top: placeAbove ? Math.max(viewportGap, rect.top - panelHeight - 8) : rect.bottom + 8,
-        width: panelWidth
-      });
-    }
-
-    updatePanelPosition();
-    window.addEventListener("resize", updatePanelPosition);
-    window.addEventListener("scroll", updatePanelPosition, true);
-    return () => {
-      window.removeEventListener("resize", updatePanelPosition);
-      window.removeEventListener("scroll", updatePanelPosition, true);
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function handlePointerDown(event: MouseEvent | TouchEvent) {
-      const target = event.target as Node;
-      if (triggerRef.current?.contains(target) || panelRef.current?.contains(target)) {
-        return;
-      }
-      setOpen(false);
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    }
-
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("touchstart", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open]);
 
   function applyColor(nextValue: string) {
     const normalized = normalizeHexColor(nextValue);
@@ -702,12 +488,12 @@ function ColorPickerControl({
     <div className="color-picker-field">
       <button
         ref={triggerRef}
-        className={open ? "color-picker-trigger is-open" : "color-picker-trigger"}
+        className="color-picker-trigger"
         type="button"
-        aria-controls={panelId}
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={ariaLabel}
+        data-state={open ? "open" : "closed"}
         style={{
           backgroundColor: safeValue,
           color: readableTextColor(safeValue)
@@ -719,16 +505,7 @@ function ColorPickerControl({
         </span>
       </button>
 
-      {open
-        ? createPortal(
-          <div
-            ref={panelRef}
-            className="color-picker-popover"
-            id={panelId}
-            role="dialog"
-            aria-label={`${ariaLabel}选择器`}
-            style={panelStyle}
-          >
+      <Popover open={open} onOpenChange={setOpen} anchorRef={triggerRef} className="color-picker-popover" label={`${ariaLabel}选择器`} width={280}>
             <div className="color-picker-palette" aria-label="色板">
               {COLOR_PALETTE.flat().map((swatch) => (
                 <button
@@ -780,10 +557,7 @@ function ColorPickerControl({
                 </label>
               ))}
             </div>
-          </div>,
-          document.body
-        )
-        : null}
+      </Popover>
     </div>
   );
 }
@@ -1340,50 +1114,8 @@ function FieldFontButton({
   value: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const selected = options.find((option) => option.value === value) ?? options[0];
-
-  useLayoutEffect(() => {
-    if (!open || !buttonRef.current) {
-      return;
-    }
-
-    const rect = buttonRef.current.getBoundingClientRect();
-    setMenuStyle({
-      left: Math.max(12, Math.min(rect.left, window.innerWidth - 272)),
-      top: rect.bottom + 8,
-      width: 260
-    });
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function onPointerDown(event: MouseEvent) {
-      const target = event.target as Node;
-      if (buttonRef.current?.contains(target) || menuRef.current?.contains(target)) {
-        return;
-      }
-      setOpen(false);
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open]);
 
   return (
     <>
@@ -1392,6 +1124,8 @@ function FieldFontButton({
         className="field-font-button"
         type="button"
         aria-label={`选择${label}字体`}
+        aria-expanded={open}
+        data-state={open ? "open" : "closed"}
         title={`${label}字体：${selected.label}`}
         onClick={(event) => {
           event.preventDefault();
@@ -1401,15 +1135,17 @@ function FieldFontButton({
       >
         F
       </button>
-      {open ? createPortal(
-        <div className="field-font-menu" ref={menuRef} style={menuStyle} role="menu" aria-label={`${label}字体`}>
-          {options.map((option) => (
+      <Popover open={open} onOpenChange={setOpen} anchorRef={buttonRef} className="field-font-menu" label={`${label}字体`} width={260}>
+        {options.map((option) => {
+          const checked = option.value === value;
+          return (
             <button
-              className={option.value === value ? "field-font-option is-selected" : "field-font-option"}
+              className="field-font-option"
               key={`${fieldKey}-${option.value}`}
               type="button"
               role="menuitemradio"
-              aria-checked={option.value === value}
+              aria-checked={checked}
+              data-state={checked ? "checked" : "unchecked"}
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -1420,10 +1156,9 @@ function FieldFontButton({
               <span style={{ fontFamily: option.value }}>F</span>
               <strong>{option.label}</strong>
             </button>
-          ))}
-        </div>,
-        document.body
-      ) : null}
+          );
+        })}
+      </Popover>
     </>
   );
 }
